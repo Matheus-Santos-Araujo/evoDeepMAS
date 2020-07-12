@@ -1,0 +1,123 @@
+
+
+to-report runKmeansLuke[ centers n-iter alpha]
+  let iter 1
+  let new-positions centers
+  while [iter <= n-iter] [
+    
+    let clusters calcdis-atrib new-positions
+    ;show clusters
+    ;garantir que cada cluster da lista seja igual ao da lista de centers!!!!!!!!!!!! para só atualizar as posições
+    let i 0
+    foreach clusters[
+      cluster ->
+      let cx -1
+      let cy -1
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;teste
+      ifelse(empty? cluster)[
+        set cx random (( matrix:get centers i 0 + (36.5)) - ( matrix:get centers i 0 - (36.5)) + 1) + ( matrix:get centers i 0 - (36.5))
+        set cy random (( matrix:get centers i 1 + (36.5)) - ( matrix:get centers i 1 - (36.5)) + 1) + ( matrix:get centers i 1 - (36.5))
+        if(cx > 149)[
+          set cx 149
+        ]
+        
+        if(cy > 149)[
+          set cy 149
+        ]
+        
+        if(cx < 0)[
+          set cx 0
+        ]
+        
+        if(cy < 0)[
+          set cy 0
+        ]
+        ;set cluster one-of targets distance-min [ distance myself] 
+        ;set cluster one-of targets
+               ]
+      ;;;;;;;;;;;;;;;;;teste;;;;;;;;;;
+      [
+      let clusterset turtle-set cluster
+      set cx mean [xcor] of clusterset   
+      set cy mean [ycor] of clusterset
+      ;talvez converter para conjunto se vier como lista
+      ]
+      
+      let new-x-value  ( (1 - alpha) * matrix:get centers i 0 ) + (alpha * cx)
+      let new-y-value ( (1 - alpha) * matrix:get centers i 1 ) + (alpha * cy)
+      
+      matrix:set new-positions i 0  new-x-value
+      matrix:set new-positions i 1  new-y-value
+      set i i + 1 
+    ]
+    
+    
+    set iter iter + 1
+  ]
+  
+  report centers
+  
+end
+;retornar uma lista de conjuntos/listas de tartarugas criadas para morrer
+to-report calcdis-atrib[centers]
+  
+  let mdist matrix:make-constant number-targets number-observers -1 
+  ; percorrer as linhas dist
+ 
+  let i  0
+ 
+  foreach sort targets [
+    t ->
+    let j 0
+    let mindis 250
+    let c -1 
+    
+   while [j < number-observers]
+    [
+      let x1 [xcor] of t
+      let y1 [ycor] of t
+      let x2 matrix:get centers j 0
+      let y2 matrix:get centers j 1
+      
+      let dist dis x1 y1 x2 y2
+      matrix:set mdist i j dist
+      ;show dist
+      if(mindis > dist)[
+        set mindis dist
+        set c j
+      ] 
+      if(j = number-observers - 1)[
+       ; show c
+        ask t[
+          set cluster-flag c 
+        ] 
+      ]
+      
+      set j j + 1
+    ]
+    set i i + 1
+  ]
+ 
+  
+  let clusters  []
+  
+  set i 0
+  while[i < number-observers][
+    let cluster []   
+    ;talvez, precise converter pra lista esta consulta aqui ->
+    set cluster sort targets with [cluster-flag = i]
+    ;show cluster
+    
+    set clusters fput cluster clusters 
+    
+    set i i + 1
+  ]    
+  
+  report clusters
+  
+end
+
+to-report dis [x1 y1 x2 y2]
+  
+  report sqrt ( ( (x1 - x2) ^ 2) + ( (y1 - y2) ^ 2 ) )
+end  
