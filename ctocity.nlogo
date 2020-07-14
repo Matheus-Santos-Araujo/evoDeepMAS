@@ -41,7 +41,7 @@ turtles-own[
 
 to setup
 
-   py:setup py:python2
+   py:setup py:python3
 
   r:eval "library(DataCombine)"
   r:eval "delim <- ','"
